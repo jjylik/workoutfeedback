@@ -1,11 +1,13 @@
+//Note! Using Vuex store is totally overkill for this app, not really needed
+
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { ratingsCollection } from "../firebase/db";
+import { addScore, updateScore } from "../firebase/db";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     ratingId: null,
     selectedRating: null
@@ -22,16 +24,12 @@ export default new Vuex.Store({
     rate({ commit, state }, score) {
       commit("setSelectedScore", score);
       if (state.ratingId) {
-        ratingsCollection.doc(state.ratingId).set({
-          score
-        });
+        updateScore(score, state.ratingId);
       } else {
-        ratingsCollection
-          .add({
-            score
-          })
-          .then(result => commit("setRatingId", result.id));
+        addScore(score).then(id => commit("setRatingId", id));
       }
     }
   }
 });
+
+export default store;

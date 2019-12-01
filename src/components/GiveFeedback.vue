@@ -1,21 +1,23 @@
 <template>
   <div class="container">
-    <h1 class="title">Miten treeni sujui?</h1>
+    <h1 class="title has-text-centered">Miten treeni sujui?</h1>
     <div class="rating is-flex">
       <span
         v-for="(item, index) in ratingOptions"
         :key="index"
         :class="{ active: selectedRating === item.rating }"
-        @click="rate(item.rating)"
+        @click="rate(item.rating, item.feedback)"
         >{{ item.label }}</span
       >
     </div>
+
     <b-notification
       class="thank-you-notification"
+      indefinite
       :active="hasRated"
       type="is-success"
       :closable="false"
-      >Mahti juttu, kiitos! 🙏</b-notification
+      >{{ selectedFeedback }}</b-notification
     >
   </div>
 </template>
@@ -29,17 +31,21 @@ export default {
       ratingOptions: [
         {
           rating: 1,
-          label: "😾"
+          label: "😾",
+          feedback: "Voi ei, ensi kerralla paremmin! 🙏"
         },
         {
           rating: 2,
-          label: "😺"
+          label: "😺",
+          feedback: "Mahti juttu, kiitos! 🙏"
         },
         {
           rating: 3,
-          label: "😸"
+          label: "😸",
+          feedback: "Mahti juttu, kiitos! 🙏"
         }
-      ]
+      ],
+      selectedFeedback: null
     };
   },
   computed: mapState({
@@ -47,7 +53,8 @@ export default {
     hasRated: state => state.selectedRating != null
   }),
   methods: {
-    rate(score) {
+    rate(score, feedback) {
+      this.selectedFeedback = feedback;
       this.$store.dispatch("rate", score);
     }
   }
@@ -56,7 +63,7 @@ export default {
 
 <style lang="scss">
 .thank-you-notification {
-  max-width: 15em;
+  max-width: 20em;
   margin: auto;
   font-size: 20px;
 }
