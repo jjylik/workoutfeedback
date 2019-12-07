@@ -12,7 +12,12 @@ Vue.use(Buefy);
 Vue.use(firestorePlugin);
 Vue.use(VueConfetti);
 
+const initialLevel = localStorage.getItem("level");
+
 new Vue({
   store,
-  render: h => h(App)
+  render: h =>
+    h(App, {
+      props: { initialLevel: initialLevel ? parseInt(initialLevel) : 0 }
+    })
 }).$mount("#app");

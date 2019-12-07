@@ -4,7 +4,8 @@ const db = firebase
   .initializeApp({ projectId: process.env.VUE_APP_FIREBASE_PROJECT })
   .firestore();
 
-export const ratingsCollection = db.collection("ratings");
+const ratingsCollection = db.collection("ratings");
+const workoutsCollection = db.collection("workouts");
 
 export const addScore = async score => {
   const result = await ratingsCollection.add({
@@ -17,4 +18,16 @@ export const updateScore = (score, ratingId) => {
   ratingsCollection.doc(ratingId).set({
     score
   });
+};
+
+export const fetchCurrentWorkout = async () => {
+  const HOUR = 1000 * 60 * 60;
+  const sixHoursAgo = Date.now() - 6 * HOUR;
+  const workout = await workoutsCollection
+    .where("time", "<", new Date())
+    .where("time", ">", new Date(sixHoursAgo))
+    .orderBy("time")
+    .limit(1)
+    .get();
+  return workout.docs[0];
 };

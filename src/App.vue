@@ -16,6 +16,16 @@ export default {
     GiveFeedback,
     Level
   },
-  computed: mapState(["level"])
+  props: {
+    initialLevel: {
+      type: Number,
+      default: 0
+    }
+  },
+  computed: mapState(["level"]),
+  created() {
+    this.$store.dispatch("fetchCurrentWorkout");
+    this.$store.commit("setLevel", this.initialLevel);
+  }
 };
 </script>

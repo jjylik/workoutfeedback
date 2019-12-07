@@ -3,7 +3,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { addScore, updateScore } from "../firebase/db";
+import { addScore, updateScore, fetchCurrentWorkout } from "../firebase/db";
 import ratingOptionsByLevel from "@/data/ratings";
 
 Vue.use(Vuex);
@@ -12,34 +12,76 @@ const store = new Vuex.Store({
   state: {
     ratingId: null,
     selectedRating: null,
-    level: 1
+    level: 0,
+    currentWorkout: null
   },
   mutations: {
     setRatingId(state, ratingId) {
       state.ratingId = ratingId;
     },
-    setSelectedScore(state, score) {
+    setSelectedRating(state, score) {
       state.selectedRating = score;
     },
     addLevel(state) {
-      state.level = state.level + 1;
+      state.level = state.level >= 3 ? 3 : state.level + 1;
+    },
+    setLevel(state, level) {
+      state.level = level;
+    },
+    setCurrentWorkout(state, currentWorkout) {
+      state.currentWorkout = currentWorkout;
     }
   },
   actions: {
-    rate({ commit, state }, score) {
-      commit("setSelectedScore", score);
+    async rate({ commit, state }, score) {
+      commit("setSelectedRating", score);
       if (state.ratingId) {
         updateScore(score, state.ratingId);
-        commit("addLevel");
       } else {
-        addScore(score).then(id => commit("setRatingId", id));
+        const id = await addScore(score);
+        commit("setRatingId", id);
+        commit("addLevel");
       }
+    },
+    async fetchCurrentWorkout({ commit }) {
+      const workout = await fetchCurrentWorkout();
+      commit("setCurrentWorkout", workout);
     }
   },
   getters: {
     getRatingOptions: state => {
       return ratingOptionsByLevel[state.level];
     }
+  }
+});
+
+//keep store free from localstorage side-effects
+store.subscribe(({ type, payload }, state) => {
+  if (type === "setCurrentWorkout") {
+    const workoutRating = localStorage.getItem(payload.id);
+    if (workoutRating) {
+      const workoutRatingParsed = JSON.parse(workoutRating);
+      store.commit("setRatingId", workoutRatingParsed.ratingId);
+      store.commit("setSelectedRating", workoutRatingParsed.selectedRating);
+    }
+  } else if (type === "setSelectedRating") {
+    const workoutRating = localStorage.getItem(state.currentWorkout.id);
+    const workoutRatingParsed = workoutRating ? JSON.parse(workoutRating) : {};
+    workoutRatingParsed.selectedRating = payload;
+    localStorage.setItem(
+      state.currentWorkout.id,
+      JSON.stringify(workoutRatingParsed)
+    );
+  } else if (type === "setRatingId") {
+    const workoutRating = localStorage.getItem(state.currentWorkout.id);
+    const workoutRatingParsed = workoutRating ? JSON.parse(workoutRating) : {};
+    workoutRatingParsed.ratingId = payload;
+    localStorage.setItem(
+      state.currentWorkout.id,
+      JSON.stringify(workoutRatingParsed)
+    );
+  } else if (type === "addLevel") {
+    localStorage.setItem("level", state.level + 1);
   }
 });
 

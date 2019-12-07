@@ -10,7 +10,7 @@
       class="thank-you-notification"
       animation="slide-next"
       indefinite
-      :active="hasRated"
+      :active="showNotification"
       type="is-success"
       :closable="false"
       >{{ selectedFeedback }}</b-notification
@@ -35,7 +35,10 @@ export default {
       hasRated: state => state.selectedRating != null,
       level: state => state.level
     }),
-    ...mapGetters({ ratingOptions: "getRatingOptions" })
+    ...mapGetters({ ratingOptions: "getRatingOptions" }),
+    showNotification: function() {
+      return this.hasRated && this.selectedFeedback !== null;
+    }
   },
   methods: {
     rate(score, feedback) {
