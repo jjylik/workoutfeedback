@@ -4,13 +4,15 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import { addScore, updateScore } from "../firebase/db";
+import ratingOptionsByLevel from "@/data/ratings";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
     ratingId: null,
-    selectedRating: null
+    selectedRating: null,
+    level: 1
   },
   mutations: {
     setRatingId(state, ratingId) {
@@ -28,6 +30,11 @@ const store = new Vuex.Store({
       } else {
         addScore(score).then(id => commit("setRatingId", id));
       }
+    }
+  },
+  getters: {
+    getRatingOptions: state => {
+      return ratingOptionsByLevel[state.level];
     }
   }
 });
