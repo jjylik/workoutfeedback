@@ -42,6 +42,8 @@ export default {
     margin: 0 20px;
     filter: grayscale(100%);
     cursor: pointer;
+    -webkit-transition: font-size 0.7s;
+    transition: font-size 0.7s;
     &.active {
       font-size: 3em;
       filter: grayscale(0%);

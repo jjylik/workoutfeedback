@@ -32,7 +32,8 @@ export default {
   computed: {
     ...mapState({
       selectedRating: state => state.selectedRating,
-      hasRated: state => state.selectedRating != null
+      hasRated: state => state.selectedRating != null,
+      level: state => state.level
     }),
     ...mapGetters({ ratingOptions: "getRatingOptions" })
   },
@@ -40,6 +41,9 @@ export default {
     rate(score, feedback) {
       this.selectedFeedback = feedback;
       this.$store.dispatch("rate", score);
+      if (this.level > 2) {
+        this.$confetti.start();
+      }
     }
   }
 };

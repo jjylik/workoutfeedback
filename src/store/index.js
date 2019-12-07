@@ -20,6 +20,9 @@ const store = new Vuex.Store({
     },
     setSelectedScore(state, score) {
       state.selectedRating = score;
+    },
+    addLevel(state) {
+      state.level = state.level + 1;
     }
   },
   actions: {
@@ -27,6 +30,7 @@ const store = new Vuex.Store({
       commit("setSelectedScore", score);
       if (state.ratingId) {
         updateScore(score, state.ratingId);
+        commit("addLevel");
       } else {
         addScore(score).then(id => commit("setRatingId", id));
       }
