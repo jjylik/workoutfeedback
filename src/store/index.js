@@ -29,11 +29,7 @@ const store = new Vuex.Store({
       state.level = level;
     },
     setCurrentWorkout(state, currentWorkout) {
-      if (currentWorkout) {
-        state.currentWorkout = currentWorkout;
-      } else {
-        state.currentWorkout = { status: "NOT_FOUND" };
-      }
+      state.currentWorkout = currentWorkout;
     }
   },
   actions: {
@@ -49,7 +45,7 @@ const store = new Vuex.Store({
     },
     async fetchCurrentWorkout({ commit }) {
       const workout = await fetchCurrentWorkout();
-      commit("setCurrentWorkout", workout);
+      commit("setCurrentWorkout", workout || { status: "NOT_FOUND" });
     }
   },
   getters: {

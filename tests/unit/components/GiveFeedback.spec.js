@@ -1,5 +1,6 @@
-import { createLocalVue, shallowMount } from "@vue/test-utils";
+import { createLocalVue, shallowMount, mount } from "@vue/test-utils";
 import GiveFeedback from "@/components/GiveFeedback.vue";
+import ratings from "@/data/ratings";
 import Vuex from "vuex";
 
 const localVue = createLocalVue();
@@ -10,6 +11,7 @@ describe("GiveFeedback", () => {
   let store;
   let actions;
   let state;
+  let getters;
 
   beforeEach(() => {
     state = {
@@ -19,9 +21,13 @@ describe("GiveFeedback", () => {
     actions = {
       rate: jest.fn()
     };
+    getters = {
+      getRatingOptions: () => ratings[1]
+    };
     store = new Vuex.Store({
       actions,
-      state
+      state,
+      getters
     });
   });
 
@@ -35,7 +41,7 @@ describe("GiveFeedback", () => {
   });
 
   it("triggers store action on click", () => {
-    const wrapper = shallowMount(GiveFeedback, {
+    const wrapper = mount(GiveFeedback, {
       store,
       localVue,
       stubs: ["b-notification"]
@@ -47,13 +53,13 @@ describe("GiveFeedback", () => {
 
   it("shows already selected rating", () => {
     state.selectedRating = 2;
-    const wrapper = shallowMount(GiveFeedback, {
+    const wrapper = mount(GiveFeedback, {
       store,
       localVue,
       stubs: ["b-notification"]
     });
     const selectedRating = wrapper.find(".rating span.active");
-    expect(selectedRating.text()).toContain("😺");
+    expect(selectedRating.text()).toContain("🙂");
     expect(wrapper.find(".thank-you-notification").exists()).toBeTruthy();
   });
 });
