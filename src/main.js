@@ -13,11 +13,9 @@ Vue.use(firestorePlugin);
 Vue.use(VueConfetti);
 
 const initialLevel = localStorage.getItem("level");
+store.commit("setLevel", initialLevel ? parseInt(initialLevel) : 0);
 
 new Vue({
   store,
-  render: h =>
-    h(App, {
-      props: { initialLevel: initialLevel ? parseInt(initialLevel) : 0 }
-    })
+  render: h => h(App)
 }).$mount("#app");

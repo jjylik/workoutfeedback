@@ -13,7 +13,7 @@ const store = new Vuex.Store({
     ratingId: null,
     selectedRating: null,
     level: 0,
-    currentWorkout: null
+    currentWorkout: { status: "NOT_INITIALIZED" }
   },
   mutations: {
     setRatingId(state, ratingId) {
@@ -29,7 +29,11 @@ const store = new Vuex.Store({
       state.level = level;
     },
     setCurrentWorkout(state, currentWorkout) {
-      state.currentWorkout = currentWorkout;
+      if (currentWorkout) {
+        state.currentWorkout = currentWorkout;
+      } else {
+        state.currentWorkout = { status: "NOT_FOUND" };
+      }
     }
   },
   actions: {
