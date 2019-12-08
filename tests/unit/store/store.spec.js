@@ -45,7 +45,7 @@ describe("store.subscribe() localStorage", () => {
   it("adds level on add level to localStorage", async () => {
     const state = { level: 1 };
     localStorageHandlerWithMockStore({ type: "addLevel" }, state);
-    expect(localStorage.__STORE__["level"]).toBe("2");
+    expect(localStorage.__STORE__["level"]).toBe("1");
   });
   it("stores workout rating to localstorage", async () => {
     const state = { currentWorkout: { id: "id" } };

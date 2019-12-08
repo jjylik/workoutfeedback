@@ -88,7 +88,7 @@ export const localStorageHandler = store => ({ type, payload }, state) => {
       JSON.stringify(workoutRatingParsed)
     );
   } else if (type === "addLevel") {
-    localStorage.setItem("level", state.level + 1);
+    localStorage.setItem("level", state.level);
   }
 };
 
