@@ -5,6 +5,7 @@ import VueConfetti from "vue-confetti";
 import { firestorePlugin } from "vuefire";
 import "buefy/dist/buefy.css";
 import store from "./store";
+import "./registerServiceWorker";
 
 Vue.config.productionTip = false;
 
