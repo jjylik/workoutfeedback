@@ -1,7 +1,13 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
+
 const db = firebase
-  .initializeApp({ projectId: process.env.VUE_APP_FIREBASE_PROJECT })
+  .initializeApp({
+    projectId: process.env.VUE_APP_FIREBASE_PROJECT,
+    apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+    authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+    appId: process.env.VUE_APP_FIREBASE_APP_ID
+  })
   .firestore();
 
 const ratingsCollection = db.collection("ratings");
@@ -30,4 +36,9 @@ export const fetchCurrentWorkout = async () => {
     .limit(1)
     .get();
   return workout.docs[0];
+};
+
+export const fetchAllRatings = async () => {
+  const workout = await ratingsCollection.limit(100).get();
+  return workout.docs;
 };

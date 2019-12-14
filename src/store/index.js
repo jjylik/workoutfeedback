@@ -3,10 +3,26 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { addScore, updateScore, fetchCurrentWorkout } from "@/firebase/db";
+import {
+  addScore,
+  updateScore,
+  fetchCurrentWorkout,
+  fetchAllRatings
+} from "@/firebase/db";
 import ratingOptionsByLevel from "@/data/ratings";
 
 Vue.use(Vuex);
+
+const mutation = {
+  SET_SELECTED_RATING: "setSelectedRating",
+  SET_RATING_ID: "setRatingId",
+  ADD_LEVEL: "addLevel",
+  SET_CURRENT_WORKOUT: "setCurrentWorkout"
+};
+
+export const action = {
+  FETCH_RATINGS: "fetchRatings"
+};
 
 const state = {
   ratingId: null,
@@ -35,18 +51,21 @@ export const mutations = {
 
 export const actions = {
   async rate({ commit, state }, score) {
-    commit("setSelectedRating", score);
+    commit(mutation.SET_SELECTED_RATING, score);
     if (state.ratingId) {
       updateScore(score, state.ratingId);
     } else {
       const id = await addScore(score);
-      commit("setRatingId", id);
-      commit("addLevel");
+      commit(mutation.SET_RATING_ID, id);
+      commit(mutation.ADD_LEVEL);
     }
   },
   async fetchCurrentWorkout({ commit }) {
     const workout = await fetchCurrentWorkout();
-    commit("setCurrentWorkout", workout || { status: "NOT_FOUND" });
+    commit(mutation.SET_CURRENT_WORKOUT, workout || { status: "NOT_FOUND" });
+  },
+  async fetchRatings() {
+    return await fetchAllRatings();
   }
 };
 
@@ -64,14 +83,17 @@ const store = new Vuex.Store({
 });
 
 export const localStorageHandler = store => ({ type, payload }, state) => {
-  if (type === "setCurrentWorkout") {
+  if (type === mutation.SET_CURRENT_WORKOUT) {
     const workoutRating = localStorage.getItem(payload.id);
     if (workoutRating) {
       const workoutRatingParsed = JSON.parse(workoutRating);
-      store.commit("setRatingId", workoutRatingParsed.ratingId);
-      store.commit("setSelectedRating", workoutRatingParsed.selectedRating);
+      store.commit(mutation.SET_RATING_ID, workoutRatingParsed.ratingId);
+      store.commit(
+        mutation.SET_SELECTED_RATING,
+        workoutRatingParsed.selectedRating
+      );
     }
-  } else if (type === "setSelectedRating") {
+  } else if (type === mutation.SET_SELECTED_RATING) {
     const workoutRating = localStorage.getItem(state.currentWorkout.id);
     const workoutRatingParsed = workoutRating ? JSON.parse(workoutRating) : {};
     workoutRatingParsed.selectedRating = payload;
@@ -79,7 +101,7 @@ export const localStorageHandler = store => ({ type, payload }, state) => {
       state.currentWorkout.id,
       JSON.stringify(workoutRatingParsed)
     );
-  } else if (type === "setRatingId") {
+  } else if (type === mutation.SET_RATING_ID) {
     const workoutRating = localStorage.getItem(state.currentWorkout.id);
     const workoutRatingParsed = workoutRating ? JSON.parse(workoutRating) : {};
     workoutRatingParsed.ratingId = payload;
@@ -87,7 +109,7 @@ export const localStorageHandler = store => ({ type, payload }, state) => {
       state.currentWorkout.id,
       JSON.stringify(workoutRatingParsed)
     );
-  } else if (type === "addLevel") {
+  } else if (type === mutation.ADD_LEVEL) {
     localStorage.setItem("level", state.level);
   }
 };
